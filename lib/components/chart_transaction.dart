@@ -50,22 +50,20 @@ class ChartTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext buildContext) {
-    return Container(
-      width: double.infinity,
-      child: Card(
+    return LayoutBuilder(builder: (ctx, constraints) {
+      return Card(
         elevation: 6,
         margin: EdgeInsets.all(20),
         child: Container(
           padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ..._groupedTransactionValues.map((data) {
-                return Flexible(
-                  fit: FlexFit.tight,
-                  flex: 1,
+                return Container(
                   child: ChartBar(
+                      height: 140,
                       label: data.format,
                       amount: data.sum,
                       percent: totalSpending == 0 ? 0 : data.sum / totalSpending),
@@ -74,7 +72,7 @@ class ChartTransaction extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

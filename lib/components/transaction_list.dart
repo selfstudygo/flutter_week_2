@@ -10,13 +10,14 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext buildContext) {
-    return Expanded(
-      flex: 1,
-      child: Container(
-        height: 300,
-        child: transactions.isEmpty
-            ? Column(
+    return Container(
+      child: transactions.isEmpty
+          ? LayoutBuilder(builder: (ctx, constraints) {
+              return Column(
                 children: [
+                  SizedBox(
+                    height: 20,
+                  ),
                   Text('No transactions added yet!',
                       style: Theme.of(buildContext)
                           .textTheme
@@ -24,24 +25,28 @@ class TransactionList extends StatelessWidget {
                           .copyWith(
                               color: Theme.of(buildContext).primaryColor)),
                   SizedBox(
+                    height: 30,
+                  ),
+                  Flexible(
+                      flex: 1,
+                      fit: FlexFit.loose,
+                      child: Image.asset('assets/images/waiting.png',
+                          height: constraints.maxHeight < 100 ? constraints.maxHeight : 100 )),
+                  SizedBox(
                     height: 10,
                   ),
-                  Container(
-                      height: 200,
-                      child: Image.asset('assets/images/waiting.png',
-                          fit: BoxFit.cover)),
                 ],
-              )
-            : ListView.builder(
-                itemBuilder: (ctx, index) {
-                  final tx = transactions[index];
-                  return TransactionItem(tx, deleteTransaction);
-                },
-                itemCount: transactions.length,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-              ),
-      ),
+              );
+            })
+          : ListView.builder(
+              itemBuilder: (ctx, index) {
+                final tx = transactions[index];
+                return TransactionItem(tx, deleteTransaction);
+              },
+              itemCount: transactions.length,
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+            ),
     );
   }
 }

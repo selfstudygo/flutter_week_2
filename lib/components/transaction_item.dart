@@ -32,11 +32,18 @@ class TransactionItem extends StatelessWidget {
             fontSize: 12,
           ),
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.delete),
-          color: Theme.of(context).errorColor,
-          onPressed: () => _deleteTransaction(_transaction.id),
-        ),
+        trailing: MediaQuery.of(context).size.width > 360
+            ? TextButton.icon(
+                onPressed: () => _deleteTransaction(_transaction.id),
+                icon: Icon(Icons.delete),
+                style: ButtonStyle(foregroundColor: MaterialStateProperty.all(Theme.of(context).errorColor)),
+                label: Text('Delete'),
+              )
+            : IconButton(
+                icon: Icon(Icons.delete),
+                color: Theme.of(context).errorColor,
+                onPressed: () => _deleteTransaction(_transaction.id),
+              ),
       ),
     );
     // return Card(
