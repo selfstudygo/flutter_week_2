@@ -57,7 +57,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   List<Transaction> _transactions = [];
   bool _showChart = false;
 
@@ -69,6 +69,23 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     }).toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void _addNewTransaction(String title, double amount, DateTime date) {
@@ -105,18 +122,62 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  Widget build(BuildContext buildContext) {
+  Widget _buildBody(context) {
     final isLandscape =
-        MediaQuery.of(buildContext).orientation == Orientation.landscape;
-    final appBar = Platform.isIOS
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        if (isLandscape) ...[
+          Flexible(
+            flex: 0,
+            fit: FlexFit.loose,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('Show Chart',
+                    style: Theme.of(context).textTheme.headline6),
+                Switch.adaptive(
+                  activeColor: Theme.of(context).primaryColor,
+                  value: _showChart,
+                  onChanged: _setShowChart,
+                ),
+              ]),
+            ),
+          ),
+          _showChart
+              ? Flexible(
+                  flex: 0,
+                  fit: FlexFit.loose,
+                  child: ChartTransaction(_recentTransaction))
+              : Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: TransactionList(_transactions, _deleteNewTransaction)),
+        ] else ...[
+          Flexible(
+              flex: 0,
+              fit: FlexFit.loose,
+              child: ChartTransaction(_recentTransaction)),
+          Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: TransactionList(_transactions, _deleteNewTransaction)),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildAppBar(context) {
+    return Platform.isIOS
         ? CupertinoNavigationBar(
             middle: Text(widget.title),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               GestureDetector(
                 child: Icon(CupertinoIcons.add),
                 onTap: () {
-                  _startAddNewTransaction(buildContext);
+                  _startAddNewTransaction(context);
                 },
               ),
             ]),
@@ -127,44 +188,19 @@ class _MyHomePageState extends State<MyHomePage> {
               IconButton(
                   icon: Icon(Icons.add),
                   onPressed: () {
-                    _startAddNewTransaction(buildContext);
+                    _startAddNewTransaction(context);
                   }),
             ],
           );
-    final body = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        if (isLandscape)
-          Flexible(
-            flex: 0,
-            fit: FlexFit.loose,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Show Chart', style: Theme.of(context).textTheme.headline6),
-                Switch.adaptive(
-                  activeColor: Theme.of(buildContext).primaryColor,
-                  value: _showChart,
-                  onChanged: _setShowChart,
-                ),
-              ]),
-            ),
-          ),
-        if (!isLandscape || _showChart == true)
-          Flexible(
-              flex: 0,
-              fit: FlexFit.loose,
-              child: ChartTransaction(_recentTransaction)),
-        if (!isLandscape || _showChart == false)
-          Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: TransactionList(_transactions, _deleteNewTransaction)),
-      ],
-    );
+  }
+
+  @override
+  Widget build(BuildContext buildContext) {
+    final appBar = _buildAppBar(buildContext);
+    final body = _buildBody(buildContext);
     return Platform.isIOS
-        ? CupertinoPageScaffold(navigationBar: appBar, child: SafeArea(child: body))
+        ? CupertinoPageScaffold(
+            navigationBar: appBar, child: SafeArea(child: body))
         : Scaffold(
             appBar: appBar,
             body: body,

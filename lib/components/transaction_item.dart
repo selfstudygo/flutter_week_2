@@ -3,10 +3,10 @@ import 'package:test_app/models/transaction.model.dart';
 import 'package:intl/intl.dart';
 
 class TransactionItem extends StatelessWidget {
-  final Transaction _transaction;
-  final Function _deleteTransaction;
+  final Transaction transaction;
+  final Function deleteTransaction;
 
-  TransactionItem(this._transaction, this._deleteTransaction);
+  TransactionItem({Key key, this.transaction, this.deleteTransaction}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,18 +15,18 @@ class TransactionItem extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
             child: FittedBox(
-              child: Text('\$ ${_transaction.amount.toStringAsFixed(2)}'),
+              child: Text('\$ ${transaction.amount.toStringAsFixed(2)}'),
             ),
             radius: 30),
         title: Text(
-          _transaction.title,
+          transaction.title,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
-          DateFormat().add_yMMMd().format(_transaction.dateAt),
+          DateFormat().add_yMMMd().format(transaction.dateAt),
           style: TextStyle(
             color: Colors.blueGrey,
             fontSize: 12,
@@ -34,7 +34,7 @@ class TransactionItem extends StatelessWidget {
         ),
         trailing: MediaQuery.of(context).size.width > 360
             ? TextButton.icon(
-                onPressed: () => _deleteTransaction(_transaction.id),
+                onPressed: () => deleteTransaction(transaction.id),
                 icon: Icon(Icons.delete),
                 style: ButtonStyle(foregroundColor: MaterialStateProperty.all(Theme.of(context).errorColor)),
                 label: Text('Delete'),
@@ -42,7 +42,7 @@ class TransactionItem extends StatelessWidget {
             : IconButton(
                 icon: Icon(Icons.delete),
                 color: Theme.of(context).errorColor,
-                onPressed: () => _deleteTransaction(_transaction.id),
+                onPressed: () => deleteTransaction(transaction.id),
               ),
       ),
     );
@@ -61,7 +61,7 @@ class TransactionItem extends StatelessWidget {
     //         padding:
     //         EdgeInsets.symmetric(vertical: 10, horizontal: 15),
     //         child: Text(
-    //           '\$ ${_transaction.amount.toStringAsFixed(2)}',
+    //           '\$ ${transaction.amount.toStringAsFixed(2)}',
     //           style: TextStyle(
     //             fontWeight: FontWeight.bold,
     //             fontSize: 18,
@@ -73,14 +73,14 @@ class TransactionItem extends StatelessWidget {
     //         crossAxisAlignment: CrossAxisAlignment.start,
     //         children: [
     //           Text(
-    //             _transaction.title,
+    //             transaction.title,
     //             style: TextStyle(
     //               fontSize: 16,
     //               fontWeight: FontWeight.bold,
     //             ),
     //           ),
     //           Text(
-    //             DateFormat().add_yMMMd().format(_transaction.dateAt),
+    //             DateFormat().add_yMMMd().format(transaction.dateAt),
     //             style: TextStyle(
     //               color: Colors.blueGrey,
     //               fontSize: 12,
